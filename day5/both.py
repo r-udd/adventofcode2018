@@ -6,7 +6,6 @@ def removePolymers (charList):
     while (True):
         if index + 1 >= len(charList):
             break
-
         if shouldBeRemoved(charList[index], charList[index+1]):
             del charList[index: index + 2]
             index = max(index - 1, 0)
@@ -15,14 +14,17 @@ def removePolymers (charList):
     return len(charList)
 
 with open('input') as f:
-	line = f.readline()
-charList = [c for c in line[:-1]] #remove linebreak
+	line = f.readline().rstrip()
+charList = list(line)
+result1 = removePolymers(charList)
+print('part1:', result1)
 
-print('part1:', removePolymers(charList))
-results = []
+minvalue = result1
 for char in 'abcdefghijklmnopqrstuvwxyz':
-    charList = [c for c in line[:-1] if c.lower() != char]
+    #currentline = line.replace(char,'').replace(char.upper(),'')
+    charList = list(line.replace(char,'').replace(char.upper(),''))
     length = removePolymers(charList)
-    results.append(length)
+    if length < minvalue:
+        minvalue = length
 
-print('part2:', min(results))
+print('part2:', minvalue)
