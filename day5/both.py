@@ -3,17 +3,14 @@ def shouldBeRemoved(char1, char2):
 
 def removePolymers (charList):
     index = 0
-    removedAny = False
     while (True):
         if index + 1 >= len(charList):
-            index = 0
-            if not removedAny:
-                break
-            removedAny = False
+            break
 
         if shouldBeRemoved(charList[index], charList[index+1]):
-            charList = charList[:index] + charList[index+2:]
-            removedAny = True
+            del charList[index]
+            del charList[index]
+            index = max(index - 1, 0)
         else:
             index += 1
     return len(charList)
@@ -29,4 +26,4 @@ for char in 'abcdefghijklmnopqrstuvwxyz':
     length = removePolymers(charList)
     results.append(length)
 
-print('part2' ,min(results))
+print('part2:', min(results))
