@@ -8,8 +8,7 @@ def removePolymers (charList):
             break
 
         if shouldBeRemoved(charList[index], charList[index+1]):
-            del charList[index]
-            del charList[index]
+            del charList[index: index + 2]
             index = max(index - 1, 0)
         else:
             index += 1
