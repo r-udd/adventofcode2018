@@ -25,20 +25,27 @@ class Cart:
         nexty = self.y+self.dirs[self.dir]['y']
         nextchar = area[nexty][nextx]
         if nextchar == '\\' and self.dir == 'left':
-            self.dir = 'up'
-        elif nextchar == '\\' and self.dir == 'up':
-            self.dir = 'left'
-        elif nextchar == '\\' and self.dir == 'right':
-            self.dir = 'down'
-        elif nextchar == '\\' and self.dir == 'down':
-            self.dir = 'right'
-        elif nextchar == '/' and self.dir == 'left':
-            self.dir = 'down'
-        elif nextchar == '/' and self.dir == 'up':
-            self.dir = 'right'
-        elif nextchar == '/' and self.dir == 'right':
-            self.dir = 'up'
-        elif nextchar == '/' and self.dir == 'down':
-            self.dir = 'left'
+            if self.dir == 'left':
+                self.dir = 'up'
+            elif self.dir == 'up':
+                self.dir = 'left'
+            elif self.dir == 'right':
+                self.dir = 'down'
+            elif self.dir == 'down':
+                self.dir = 'right'
+        elif nextchar == '/':
+            if self.dir == 'left':
+                self.dir = 'down'
+            elif self.dir == 'up':
+                self.dir = 'right'
+            elif self.dir == 'right':
+                self.dir = 'up'
+            elif self.dir == 'down':
+                self.dir = 'left'
+        elif nextchar == '+':
+            if nextturn = 'left':
+                
+        else:
+            print('ERROR')
         self.x = nextx
         self.y = nexty
