@@ -53,14 +53,22 @@ nocrash = True
 tick = 0
 #printmap(area,carts)
 while nocrash:
-    for cart in carts:
-        cart.move(area)
-        
-        for c in carts:
-            if cart.iscolliding(c):
-                print('BOOM x, y, tick', cart.x, cart.y, tick)
-                nocrash = False
-        
+    crashing = []
+    carts.sort()
+    for movingcart in carts:
+        movingcart.move(area)
+        for othercart in carts:
+            if movingcart.iscolliding(othercart):
+                carts = [x for x in carts if x != movingcart and x != othercart]
+                print('BOOM tick, x, y', tick, movingcart.x, movingcart.y, ' remaining ', len(carts))
+                #print(carts)
+                #break
+    if len(carts) <= 1:
+        print('Last wagon standing', carts[0].x, carts[0].y)
+        nocrash = False        
     tick+=1
     #printmap(area,carts)
     #input()
+
+for cart in carts:
+    print(cart)
