@@ -1,17 +1,17 @@
 from cart import *
 
-def printmap (area):
-    for row in area:
-        for tile in row:
-            print(tile, end='')
+def printmap (area,carts):
+    for y, row in enumerate(area):
+        for x,tile in enumerate(row):
+            for cart in carts:
+                if cart.x == x and cart.y == y:
+                    print('X', end='')
+                    break
+            else:
+                print(tile, end='')
         print()
     print('\n')
 
-dirs = {}
-dirs['left'] = {'x': -1, 'y': 0}
-dirs['up'] = {'x': 0, 'y': -1}
-dirs['right'] = {'x': 1, 'y': 0}
-dirs['down'] = {'x': 0, 'y': 1}
 carts = []
 area = []
 with open('day13/test') as f:
@@ -39,6 +39,14 @@ with open('day13/test') as f:
 
 carts.sort()
 
-printmap(area)
+nocrash = True
+tick = 0
+while nocrash:
+    for cart in carts:
+        cart.move(area)
+    tick+=1
+    printmap(area,carts)
+    input()
+
 for cart in carts:
     print(cart)
