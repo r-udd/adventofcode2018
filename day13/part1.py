@@ -47,12 +47,12 @@ with open('day13/input') as f:
             #print(char, end='')
         area.append(arealine)
 
-carts.sort()
 
 nocrash = True
 tick = 0
 #printmap(area,carts)
 while nocrash:
+    carts.sort()
     for cart in carts:
         cart.move(area)
         
