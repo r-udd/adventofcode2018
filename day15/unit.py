@@ -1,31 +1,30 @@
 from abc import ABCMeta, abstractmethod
 from manhattan import *
+from coord import *
 
 class Unit(metaclass=ABCMeta):
 
-    def __init__(self, x, y, hp, ap, isgoblin):
-        self.x = x
-        self.y = y
+
+
+    def __init__(self, coord, hp, ap, isgoblin):
+        self.coord = coord
         self.hp = hp
         self.ap = ap
 
     def __lt__(self, other):
-        if self.x < other.x:
-            return True
-        elif self.x == other.x:
-            return self.y < other.y
+        return self.coord < other.coord
     
-    def __eq__(self, other):
-        '''Used from "in" operator'''
+    '''def __eq__(self, other):
+        "Used from "in" operator"
         print('in check')
-        return self.x == other.x and self.y == other.y
+        return self.x == other.x and self.y == other.y'''
     
-    def iscolliding(self, other):
-        '''Used for collision calculation, cant collide with itself'''
-        return self.x == other.x and self.y == other.y
+    '''def iscolliding(self, other):
+        "Used for collision calculation, cant collide with itself"
+        return self.x == other.x and self.y == other.y'''
 
     def __str__(self):
-        return ' x: ' + str(self.x) + ' y: ' + str(self.y) + ' hp: ' + str(self.hp) + ' ap: ' + str(self.ap)
+        return ' x: ' + str(self.coord.x) + ' y: ' + str(self.coord.y) + ' hp: ' + str(self.hp) + ' ap: ' + str(self.ap)
 
     def isgoblin(self):
         return False
@@ -34,14 +33,18 @@ class Unit(metaclass=ABCMeta):
         return False
     
     def isadjacent(self, other):
-        return manhattan(self, other) == 1
+        return manhattanuu(self, other) == 1
 
     def takedamage(self, damage):
-        hp -= damage
+        self.hp -= damage
 
     @abstractmethod
     def attackifpossible (self, goblin, elves):
-        pass
+        raise NotImplementedError('subclasses must override attackifpossible()!')
+
+    @abstractmethod
+    def gettargets (self, units):
+        raise NotImplementedError('subclasses must override gettargets()!')
 
 class Goblin(Unit):
 

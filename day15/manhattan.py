@@ -1,5 +1,8 @@
-def manhattan(unit, position):
-    return abs (unit.x - position['x']) + abs(unit.y - position['y'])
+def manhattanuc(unit, coord):
+    return abs (unit.coord.x - coord.coord.x) + abs(unit.coord.y - coord.y)
 
-def manhattan(unit, unit2):
-    return abs (unit.x - unit2.x) + abs(unit.y - unit2.y)
+def manhattanuu(unit, unit2):
+    return abs (unit.coord.x - unit2.coord.x) + abs(unit.coord.y - unit2.coord.y)
+
+def manhattancc(coord, coord2):
+    return abs (coord.x - coord2.x) + abs(coord.y - coord2.y)
