@@ -1,13 +1,23 @@
 from coord import *
 
-def findhole (area, coord, dir):
+def getchar(coord, moving, still, clay):
+    if coord in moving:
+        return '|'
+    elif coord in still:
+        return '~'
+    elif coord in clay:
+        return '#'
+    else:
+        return '.'
+
+def findhole (coord, dir, moving, still, clay):
     #side = Coord(coord+dir, coord.y)
     current = Coord(coord.x, coord.y)
     while True:
         below = Coord(current.x, current.y+1)
         side = Coord(current.x+dir, current.y)
-        belowchar = area[below.y][below.x]
-        sidechar = area[side.y][side.x]
+        belowchar = getchar(below, moving, still,clay)
+        sidechar = getchar(side, moving, still,clay)
         if belowchar == '.':
             return True, current
         elif sidechar == '#':
@@ -18,7 +28,7 @@ def createmap(clay, movingwater, minx, maxx, maxy):
     area = []
     for y in range(maxy+1):
         arealine = []
-        for x in range(minx, maxx+2):
+        for x in range(minx-1, maxx+2):
             if Coord(x,y) in clay:
                 arealine.append('#')
             elif Coord(x,y) == movingwater:
@@ -30,46 +40,44 @@ def createmap(clay, movingwater, minx, maxx, maxy):
         area.append(arealine)
     return area
 
-def findlowestmovingwater(area):
-    for y in range(len(area)-1, -1, -1):
-        for x in range(len(area[y])-1, -1, -1):
-            if area[y][x] == '|':
-                if y == len(area) - 1:
-                    continue
-                below = area[y+1][x]
-                if below == '|':
-                    continue
-                elif below == '.':
-                    return Coord(x,y)
+def findlowestmovingwater(maxy, movingwater, still, clay):
+    for moving in movingwater:
+        x = moving.x
+        y = moving.y
+        if y == maxy:
+            continue
+        bc = Coord(x, y+1)
+        below = getchar(bc, movingwater, still, clay)
+        if below == '|':
+            continue
+        elif below == '.':
+            return Coord(x,y)
 
-                if x-1 >= 0:
-                    left = area[y][x-1]
-                else: 
-                    left = '|'
-                if x+1 < len(area[y]):
-                    right = area[y][x+1]
-                else:
-                    right = '|'
-                
-                if below in ['#', '~']:
-                    if left == '.' or right == '.':
-                        return Coord(x,y)
-                    elif left == '#' and right == '#':
-                        return Coord(x,y)
+        lc = Coord(x-1, y)
+        #if x-1 > minx:
+        left = getchar(lc, movingwater, still, clay)
+        #else: 
+        #    left = '|'
+
+        rc = Coord(x+1, y)
+        #if x+1 < maxx):
+        right = getchar(rc, movingwater, still, clay)
+        #else:
+        #    right = '|'
+        
+        if below in ['#', '~']:
+            if left == '.' or right == '.':
+                return Coord(x,y)
+            elif left == '#' and right == '#':
+                return Coord(x,y)
                         
 
-def countwater(area):
-    res = 0
-    for line in area:
-        for char in line:
-            if char in ['~', '|']:
-                res += 1
-    return res
-
-def printmap(area):
-    for line in area:
-        for x in line:
-            print(x, end='')
+def printmap(minx, maxx, maxy, movingwater, stillwater, clay):
+    for y in range(maxy):
+        for x in range(minx-1, maxx+1):
+            c = Coord(x,y)
+            char = getchar(c, movingwater, stillwater, clay)
+            print(char, end='')
         print()
     print()
 
@@ -102,32 +110,36 @@ for c in clay:
     if c.y > maxy:
         maxy = c.y
 
-#movingwater = [Coord(500,1)]
+movingwater = {Coord(500,1)}
 
 #clay.sort()
-stillwater = []
-area = createmap(clay, Coord(500,1), minx, maxx, maxy)
+stillwater = set()
+#area = createmap(clay, Coord(500,1), minx, maxx, maxy)
 #printmap(area)
 while True:
-    moving = findlowestmovingwater(area)
+    moving = findlowestmovingwater(maxy, movingwater, stillwater, clay)
     if moving == None:
         break
     below = Coord(moving.x, moving.y+1)
-    belowchar = area[below.y][below.x]
+    belowchar = getchar(below, movingwater, stillwater, clay)
     if belowchar == '.':
-        area[below.y][below.x] = '|'
+        movingwater.add(below)
     elif belowchar == '#' or belowchar == '~':
-        foundleft, left = findhole(area, moving, -1) #look to the left
-        foundright, right = findhole(area, moving, 1) #look to the right
+        foundleft, left = findhole(moving, -1, movingwater, stillwater, clay) #look to the left
+        foundright, right = findhole(moving, 1, movingwater, stillwater, clay) #look to the right
         if not foundleft and not foundright:
             for i in range(left.x, right.x+1):
-                area[moving.y][i] = '~'
+                c = Coord(i, moving.y)
+                stillwater.add(c)
+                if c in movingwater:
+                    movingwater.remove(c)
         if foundleft or foundright:
             for i in range(left.x, right.x+1):
-                area[moving.y][i] = '|'
-    #printmap(area)
+                c = Coord(i, moving.y)
+                movingwater.add(c)
+    #printmap(minx, maxx, maxy, movingwater, stillwater, clay)
 
-print('Water amount', countwater(area))
+print('Water amount', len(stillwater) + len(movingwater))
 '''for water in movingwater:
     below = Coord(water.x, water.y+1)
     if below in movingwater:
