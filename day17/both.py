@@ -73,8 +73,8 @@ def findlowestmovingwater(maxy, movingwater, still, clay):
                         
 
 def printmap(minx, maxx, maxy, movingwater, stillwater, clay):
-    for y in range(maxy):
-        for x in range(minx-1, maxx+1):
+    for y in range(maxy+1):
+        for x in range(minx-1, maxx+2):
             c = Coord(x,y)
             char = getchar(c, movingwater, stillwater, clay)
             print(char, end='')
@@ -82,7 +82,7 @@ def printmap(minx, maxx, maxy, movingwater, stillwater, clay):
     print()
 
 clay = set()
-with open('day17/input') as f:
+with open('input') as f:
     for line in f:
         if line.startswith('x'):
             x = int(line[2:line.index(',')])
@@ -102,6 +102,7 @@ with open('day17/input') as f:
 maxx = 0
 minx = 100000
 maxy = 0
+miny = 100000
 for c in clay:
     if c.x > maxx:
         maxx = c.x
@@ -109,6 +110,8 @@ for c in clay:
         minx = c.x
     if c.y > maxy:
         maxy = c.y
+    if c.y < miny:
+        miny = c.y
 
 movingwater = {Coord(500,1)}
 
@@ -116,6 +119,7 @@ movingwater = {Coord(500,1)}
 stillwater = set()
 #area = createmap(clay, Coord(500,1), minx, maxx, maxy)
 #printmap(area)
+counter = 1
 while True:
     moving = findlowestmovingwater(maxy, movingwater, stillwater, clay)
     if moving == None:
@@ -137,9 +141,16 @@ while True:
             for i in range(left.x, right.x+1):
                 c = Coord(i, moving.y)
                 movingwater.add(c)
-    #printmap(minx, maxx, maxy, movingwater, stillwater, clay)
-
-print('Water amount', len(stillwater) + len(movingwater))
+    #if counter == 1000:
+     #   printmap(minx, maxx, maxy, movingwater, stillwater, clay)
+      #  break
+    counter += 1
+#printmap(minx, maxx, maxy, movingwater, stillwater, clay)
+print('maxy', maxy)
+movingcount = len([s for s in movingwater if s.y >=miny and s.y<=maxy])
+stillcount = len([s for s in stillwater if s.y >=miny and s.y<=maxy])
+print('part1', movingcount + stillcount)
+print('part2', stillcount)
 '''for water in movingwater:
     below = Coord(water.x, water.y+1)
     if below in movingwater:
