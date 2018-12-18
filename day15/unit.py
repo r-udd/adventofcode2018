@@ -24,7 +24,8 @@ class Unit(metaclass=ABCMeta):
         return self.x == other.x and self.y == other.y'''
 
     def __str__(self):
-        return ' x: ' + str(self.coord.x) + ' y: ' + str(self.coord.y) + ' hp: ' + str(self.hp) + ' ap: ' + str(self.ap)
+        return self.symbol + '(' + str(self.hp) + ')'
+        #return ' x: ' + str(self.coord.x) + ' y: ' + str(self.coord.y) + ' hp: ' + str(self.hp) + ' ap: ' + str(self.ap)
 
     def isgoblin(self):
         return False
@@ -39,7 +40,7 @@ class Unit(metaclass=ABCMeta):
         self.hp -= damage
 
     @abstractmethod
-    def attackifpossible (self, goblin, elves):
+    def attackifpossible (self, area, units, goblins, elves):
         raise NotImplementedError('subclasses must override attackifpossible()!')
 
     @abstractmethod
@@ -56,11 +57,20 @@ class Goblin(Unit):
     def isgoblin(self):
         return True
         
-    def attackifpossible (self, goblins, elves):
+    def attackifpossible (self, area, units, goblins, elves):
+        target = None
         for elf in elves:
             if self.isadjacent(elf):
-                elf.takedamage(self.ap)
-                return elf
+                if target == None:
+                    target = elf
+                elif elf.hp < target.hp:
+                    target = elf
+        if target != None:
+            target.takedamage(self.ap)
+            if target.hp <= 0:
+                units.remove(target)
+                elves.remove(target)
+        return target
 
 class Elf(Unit):
 
@@ -72,10 +82,17 @@ class Elf(Unit):
     def iself(self):
         return True
         
-    def attackifpossible (self, goblins, elves):
+    def attackifpossible (self, area, units, goblins, elves):
+        target = None
         for goblin in goblins:
             if self.isadjacent(goblin):
-                goblin.takedamage(self.ap)
-                return goblin
-
-        
+                if target == None:
+                    target = goblin
+                elif goblin.hp < target.hp:
+                    target = goblin
+        if target != None:
+            target.takedamage(self.ap)
+            if target.hp <= 0:
+                units.remove(target)
+                goblins.remove(target)
+        return target

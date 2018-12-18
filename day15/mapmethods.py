@@ -8,6 +8,10 @@ def printmap (area,units, highlights=[]):
                 print('+', end='')
             else:
                 print(tile, end='')
+        print(end=' ')
+        for unit in units:
+            if unit.coord.y == y:
+                print(unit, end=', ')
         print()
     print('\n')
 
@@ -47,6 +51,9 @@ def move(area, old, new):
     if new != None:
         area[new.y][new.x] = area[old.y][old.x]
         area[old.y][old.x] = '.'
+
+def removefrommap(area, coord):
+    area[coord.y][coord.x] = '.'
 
 class Node:
 
@@ -103,15 +110,17 @@ def astar(area, start, goal, units):
         
         closedset.append(current)
 
-    prev = goalnodes[0]
-    node = goalnodes[0]
-    highlight = [node.coord]
-    while node.parent != None:
-        highlight.append(node.parent.coord)
-        prev = node
-        node = node.parent
-    #printmap(area, units, highlight)
+    if len(goalnodes) > 0:
+        prev = goalnodes[0]
+        node = goalnodes[0]
+        highlight = [node.coord]
+        while node.parent != None:
+            highlight.append(node.parent.coord)
+            prev = node
+            node = node.parent
+        #printmap(area, units, highlight)
 
-    return prev.coord, goalnodes[0].g
-#    for goal in goalnodes
- #       firststep 
+        return prev.coord, goalnodes[0].g
+    #    for goal in goalnodes
+    #       firststep 
+    return None, 0

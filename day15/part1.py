@@ -1,15 +1,16 @@
 from unit import *
 from mapmethods import *
 
-area, units, elves, goblins = readmap('day15/testC')
+area, units, elves, goblins = readmap('day15/input')
 printmap(area, units,[])
 gameover = False
+roundno = 0
 while not gameover:
     units.sort()
     elves.sort()
     goblins.sort()
     for unit in units:
-        attackedunit = unit.attackifpossible(goblins,elves)
+        attackedunit = unit.attackifpossible(area, units, goblins,  elves)
         goalpositions = set()
         if attackedunit == None:
 
@@ -29,23 +30,23 @@ while not gameover:
             for goal in goalpositions:
                 #printmap(area, units, [goal])
                 position, cost = astar(area, unit.coord, goal, units)
-                if cost < mincost:
+                if position != None and cost < mincost:
                     mincost = cost
-                    if nextpos != None:
-                        nextpos = position
+                    nextpos = position
             if nextpos != None:
                 move(area, unit.coord, nextpos)
                 unit.coord = nextpos
+                attackedunit = unit.attackifpossible(area, units, goblins, elves)
+                if attackedunit != None and attackedunit.hp <= 0:
+                    removefrommap(area, attackedunit.coord)
             #print('Moved:')
             #printmap(area, units)
         elif attackedunit.hp <= 0:
-            units.remove(attackedunit)
-            if attackedunit.iself():
-                elves.remove(attackedunit)
-            elif attackedunit.isgoblin:
-                goblins.remove(attackedunit)
-            else: 
-                print('ERROR')
+            removefrommap(area, attackedunit.coord)
 
+    totalhealth = 0
+    for unit in units:
+        totalhealth += unit.hp
+    print('round', roundno, 'health', totalhealth, 'outcome', totalhealth*roundno)
     printmap(area, units)
-
+    roundno += 1
