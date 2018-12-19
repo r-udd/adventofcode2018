@@ -4,8 +4,6 @@ from coord import *
 
 class Unit(metaclass=ABCMeta):
 
-
-
     def __init__(self, coord, hp, ap, isgoblin):
         self.coord = coord
         self.hp = hp

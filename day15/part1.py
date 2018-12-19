@@ -1,5 +1,6 @@
 from unit import *
 from mapmethods import *
+from manhattan import *
 
 area, units, elves, goblins = readmap('day15/input')
 printmap(area, units,[])
@@ -11,7 +12,7 @@ while not gameover:
     goblins.sort()
     for unit in units:
         attackedunit = unit.attackifpossible(area, units, goblins,  elves)
-        goalpositions = set()
+        goalpositions = []
         if attackedunit == None:
 
             targets = unit.gettargets(units)
@@ -20,8 +21,7 @@ while not gameover:
                 break
 
             for target in targets:
-                goalpositions = goalpositions.union(getemptyadjecentsset(area, target.coord))
-            goalpositions = list(goalpositions)
+                goalpositions += getemptyclosecoordadjecents(area, unit.coord, target.coord)
             goalpositions.sort() ##Remove??
 
             nextpos = None
@@ -29,10 +29,11 @@ while not gameover:
             #printmap(area, units, goalpositions)
             for goal in goalpositions:
                 #printmap(area, units, [goal])
-                position, cost = astar(area, unit.coord, goal, units)
-                if position != None and cost < mincost:
-                    mincost = cost
-                    nextpos = position
+                if manhattanuc(unit,goal) < mincost:
+                    position, cost = astar(area, unit.coord, goal, units)
+                    if position != None and cost < mincost:
+                        mincost = cost
+                        nextpos = position
             if nextpos != None:
                 move(area, unit.coord, nextpos)
                 unit.coord = nextpos

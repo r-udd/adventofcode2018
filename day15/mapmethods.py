@@ -41,8 +41,11 @@ def readmap (filename):
 def isempty(area, coord):
     return area[coord.y][coord.x] == '.'
 
-def getemptyadjecentsset(area, coord):
-    return {pos for pos in coord.getadjecents() if isempty(area, pos)}
+#def getemptyadjecentsset(area, coord):
+#    return {pos for pos in coord.getadjecents() if isempty(area, pos)}
+
+def getemptyclosecoordadjecents(area, attacker, target):
+    return [pos for pos in target.getclosecoordadjecents(attacker) if isempty(area, pos)]
 
 def getemptyadjecentslist(area, coord):
     return [pos for pos in coord.getadjecents() if isempty(area, pos)]
@@ -65,7 +68,8 @@ class Node:
         self.parent = parent
     
     def __lt__(self, other):
-        return self.coord < other.coord
+        return self.f < other.f or (self.f == other.f and self.coord < other.coord)
+        #return self.coord < other.coord
 
     def __str__(self):
         return str(self.coord) + ' parent: ' + str(self.parent)
