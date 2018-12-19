@@ -49,5 +49,5 @@ while not gameover:
     for unit in units:
         totalhealth += unit.hp
     print('round', roundno, 'health', totalhealth, 'outcome', totalhealth*roundno)
-    printmap(area, units)
+    #printmap(area, units)
     roundno += 1

@@ -70,6 +70,9 @@ class Node:
     def __lt__(self, other):
         return self.f < other.f or (self.f == other.f and self.coord < other.coord)
         #return self.coord < other.coord
+    
+    def __eq__(self,other):
+        return other != None and self.coord == other.coord
 
     def __str__(self):
         return str(self.coord) + ' parent: ' + str(self.parent)
@@ -80,39 +83,33 @@ def astar(area, start, goal, units):
     goalnodes = []
     #open = getemptyadjecents(area, start)
     openset = [Node(start, 0, 0, 0)]
+    camefrom = [] #MAP?
     goalcost = 100000
     while len(openset) != 0:
         openset.sort()
         current = openset.pop(0)
-        for adjacent in getemptyadjecentslist(area, current.coord):
+        closedset.append(current)
 
+        for adjacent in getemptyadjecentslist(area, current.coord):
+            
             skip = False
             g = current.g + 1
             h = manhattancc(adjacent, goal)
             f = g + h
             successor = Node(adjacent, f, g, h, current)
+            if successor in closedset:
+                continue
             if g > goalcost:
                 break
 
-            if adjacent == goal and g < goalcost:
+            if successor not in openset:
+                openset.append(successor)
+
+            if successor.coord == goal:
                 goalnodes = [successor]
                 goalcost = g
-            elif adjacent == goal and g == goalcost:
-                goalnodes.append(successor)
-
-            for opened in openset:
-                if opened.coord == adjacent and opened.f < f:
-                    skip = True
-                    break
-
-            for closed in closedset:
-                if closed.coord == adjacent and closed.f < f:
-                    skip = True
-                    break
-            if not skip:
-                openset.append(successor)
+                break
         
-        closedset.append(current)
 
     if len(goalnodes) > 0:
         prev = goalnodes[0]
