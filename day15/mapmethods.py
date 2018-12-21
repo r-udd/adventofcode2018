@@ -1,10 +1,13 @@
 from unit import *
 from coord import *
 
-def printmap (area,units, highlights=[]):
+def printmap (area,units, highlights=[], xspot=Coord(-1,-1)):
     for y, row in enumerate(area):
         for x, tile in enumerate(row):
-            if Coord(x,y) in highlights:
+            c = Coord(x,y)
+            if c == xspot:
+                print('X', end='')
+            elif c in highlights:
                 print('+', end='')
             else:
                 print(tile, end='')
@@ -41,8 +44,8 @@ def readmap (filename):
 def isempty(area, coord):
     return area[coord.y][coord.x] == '.'
 
-#def getemptyadjecentsset(area, coord):
-#    return {pos for pos in coord.getadjecents() if isempty(area, pos)}
+def getemptyadjecentsset(area, coord):
+    return {pos for pos in coord.getadjecents() if isempty(area, pos)}
 
 def getemptyclosecoordadjecents(area, attacker, target):
     return [pos for pos in target.getclosecoordadjecents(attacker) if isempty(area, pos)]
@@ -60,15 +63,13 @@ def removefrommap(area, coord):
 
 class Node:
 
-    def __init__(self, coord, f, g, h, parent=None):
+    def __init__(self, coord, cost, parent=None):
         self.coord = coord
-        self.f = f
-        self.g = g
-        self.h = h
+        self.cost = cost
         self.parent = parent
     
     def __lt__(self, other):
-        return self.f < other.f or (self.f == other.f and self.coord < other.coord)
+        return self.cost < other.cost or (self.cost == other.cost and self.coord < other.coord)
         #return self.coord < other.coord
     
     def __eq__(self,other):
@@ -78,7 +79,47 @@ class Node:
         return str(self.coord) + ' parent: ' + str(self.parent)
         
 
-def astar(area, start, goal, units):
+def bfsearch(area, start, goals, units):
+    closedset = []
+    #open = getemptyadjecents(area, start)
+    openset = [Node(start, 0)]
+    found = False
+    while len(openset) != 0:
+        openset.sort()
+        current = openset.pop(0)
+        closedset.append(current)
+
+        for adjacent in getemptyadjecentslist(area, current.coord):
+            
+            cost = current.cost + 1
+            successor = Node(adjacent, cost, current)
+            if adjacent in goals:
+                found = True
+                break
+            elif successor in closedset:
+                index = closedset.index(successor)
+                if cost < closedset[index].cost:
+                    closedset[index] = successor
+                continue
+            if successor not in openset:
+                openset.append(successor)
+        if start.x == 22 and start.y == 13:
+            printmap(area, units, [c.coord for c in closedset+openset], start)
+        if found:
+            node = successor
+            highlight = []
+            while node.cost != 1:
+                highlight.append(node.coord)
+                node = node.parent
+            printmap(area, units, highlight, successor.coord)
+            
+
+            return node.coord
+    #    for goal in goalnodes
+    #       firststep 
+    return None
+
+def astar(area, start, goal):
     closedset = []
     goalnodes = []
     #open = getemptyadjecents(area, start)

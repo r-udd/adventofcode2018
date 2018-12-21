@@ -42,15 +42,15 @@ class Unit(metaclass=ABCMeta):
         raise NotImplementedError('subclasses must override attackifpossible()!')
 
     @abstractmethod
-    def gettargets (self, units):
+    def gettargets (self, units, dead):
         raise NotImplementedError('subclasses must override gettargets()!')
 
 class Goblin(Unit):
 
     symbol = 'G'
 
-    def gettargets(self, units):
-        return [unit for unit in units if unit.iself()]
+    def gettargets(self, units, dead):
+        return [unit for unit in units if unit.iself() and unit not in dead]
 
     def isgoblin(self):
         return True
@@ -66,7 +66,7 @@ class Goblin(Unit):
         if target != None:
             target.takedamage(self.ap)
             if target.hp <= 0:
-                units.remove(target)
+                #units.remove(target)
                 elves.remove(target)
         return target
 
@@ -74,8 +74,8 @@ class Elf(Unit):
 
     symbol = 'E'
 
-    def gettargets(self, units):
-        return [unit for unit in units if unit.isgoblin()]
+    def gettargets(self, units, dead):
+        return [unit for unit in units if unit.isgoblin() and unit not in dead]
 
     def iself(self):
         return True
@@ -91,6 +91,6 @@ class Elf(Unit):
         if target != None:
             target.takedamage(self.ap)
             if target.hp <= 0:
-                units.remove(target)
+                #units.remove(target)
                 goblins.remove(target)
         return target
