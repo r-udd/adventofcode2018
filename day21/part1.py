@@ -20,18 +20,18 @@ with open('day21/input') as f:
             c = int(splitted[3])
             program.append((funcname, a, b, c))
 ip = regs[ipindex]
-counter = 0
 while True:
-    counter+=1
-    regsbefore = regs.copy()
-    try:
-        operation = program[ip]
-    except IndexError:
-        print('answer', regs[0])   
+    #regsbefore = regs.copy()
+    operation = program[ip]
+    
+    if ip == 18:
+        regs[1] = int(regs[2] / 256)
+    elif ip == 28:
+        print(regs[4])
         break
     regs[ipindex] = ip
     funclist[operation[0]](regs, operation[1],operation[2],operation[3])
-    print(ip, regsbefore, operation, regs)
+    #print(ip, regsbefore, operation, regs)
     #if counter % 1000 == 0:
     #    print(ip, regsbefore, operation, regs)
     ip = regs[ipindex] + 1
