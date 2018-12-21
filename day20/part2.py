@@ -1,25 +1,4 @@
-from room import *
-
-def findbackwardmatchingparenthesis(text, index):
-    count = 0
-    for i in range(index, -1, -1):
-        if text[i] == ')':
-            count += 1
-        elif text[i] == '(':
-            count -= 1
-            if count == 0:
-                return i
-
-def removeparenthesis(text):
-    right = text.rfind('|)')
-    while right != -1:
-        match = findbackwardmatchingparenthesis(text, right + 1)
-        text = text[:match] + text[right+2:]
-
-        right = text.rfind('|)')
-    return text
-
-    
+from room import *    
 
 def step(rooms, currentroom, nextroom, nextroominfo):
     if nextroom not in rooms:
@@ -58,7 +37,7 @@ def followpath (rooms, currentroom, text):
         index += 1
 
 start = 0
-expected = [3, 2, 10, 18, 23, 31, -1]
+expected = [0, 0, 0, 0, 0, 0, -1]
 
 for test in range(len(expected)):
 
@@ -66,19 +45,15 @@ for test in range(len(expected)):
     rooms = {currentroom: RoomInfo(0, None)}
     with open('day20/test' + str(start + test)) as f:
         line = f.readline()
-    text = removeparenthesis(line)
-    followpath(rooms, currentroom, text[1:])
+    followpath(rooms, currentroom, line[1:])
 
-    currentmax = 0
-    roommax = None
+    over1000 = 0
     for room, info in rooms.items():
-        if currentmax < info.cost:
-            currentmax = info.cost
-            roommax = room
+        if 1000 <= info.cost:
+            over1000 += 1
 
-    room = roommax
     print('test no ' + str(test))
     if test < 6:
-        assert expected[test]==currentmax, 'expected: ' + str(expected[test]) + ' found: ' + str(currentmax)
+        assert expected[test]==over1000, 'expected: ' + str(expected[test]) + ' found: ' + str(currentmax)
         
-print('Answer', currentmax)
+print('Answer', over1000)
