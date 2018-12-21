@@ -55,19 +55,19 @@ class Goblin(Unit):
     def isgoblin(self):
         return True
         
-    def attackifpossible (self, area, units, goblins, elves):
+    def attackifpossible (self, area, units, dead):
         target = None
+        coords = self.coord.getadjecents()
+        elves = [unit for unit in units if unit.iself() and unit.coord in coords and unit not in dead]
         for elf in elves:
-            if self.isadjacent(elf):
-                if target == None:
-                    target = elf
-                elif elf.hp < target.hp:
-                    target = elf
+            if target == None:
+                target = elf
+            elif elf.hp < target.hp:
+                target = elf
+            elif elf.hp == target.hp and elf.coord < target.coord:
+                target = elf
         if target != None:
             target.takedamage(self.ap)
-            if target.hp <= 0:
-                #units.remove(target)
-                elves.remove(target)
         return target
 
 class Elf(Unit):
@@ -80,17 +80,17 @@ class Elf(Unit):
     def iself(self):
         return True
         
-    def attackifpossible (self, area, units, goblins, elves):
+    def attackifpossible (self, area, units, dead):
         target = None
+        coords = self.coord.getadjecents()
+        goblins = [unit for unit in units if unit.isgoblin() and unit.coord in coords and unit not in dead]
         for goblin in goblins:
-            if self.isadjacent(goblin):
-                if target == None:
-                    target = goblin
-                elif goblin.hp < target.hp:
-                    target = goblin
+            if target == None:
+                target = goblin
+            elif goblin.hp < target.hp:
+                target = goblin
+            elif goblin.hp == target.hp and goblin.coord < target.coord:
+                target = goblin
         if target != None:
             target.takedamage(self.ap)
-            if target.hp <= 0:
-                #units.remove(target)
-                goblins.remove(target)
         return target

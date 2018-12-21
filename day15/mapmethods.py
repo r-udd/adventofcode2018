@@ -63,7 +63,7 @@ def removefrommap(area, coord):
 
 class Node:
 
-    def __init__(self, coord, cost, parent=None):
+    def __init__(self, coord, cost, parent=None, firststep=None):
         self.coord = coord
         self.cost = cost
         self.parent = parent
@@ -83,11 +83,11 @@ def bfsearch(area, start, goals, units):
     closedset = []
     #open = getemptyadjecents(area, start)
     openset = [Node(start, 0)]
-    firststeps = []
+    foundgoals = []
     anyfound = False
     foundcost = 0
     while len(openset) != 0:
-        openset.sort()
+        #openset.sort()
         current = openset.pop(0)
         closedset.append(current)
 
@@ -105,13 +105,8 @@ def bfsearch(area, start, goals, units):
             elif adjacent in goals:
                 anyfound = True
                 foundcost = successor.cost
-                closedset.append(successor)
-                node = successor
-                highlight = []
-                while node.cost != 1:
-                    highlight.append(node.coord)
-                    node = node.parent
-                firststeps.append(node)
+                #closedset.append(successor)
+                foundgoals.append(successor)
                 '''elif successor in closedset:
                 index = closedset.index(successor)
                 if cost < closedset[index].cost:
@@ -133,56 +128,14 @@ def bfsearch(area, start, goals, units):
 
             return node.coord'''
     if anyfound:
-        firststeps.sort()
-        return firststeps[0].coord
+        foundgoals.sort()
+        node = foundgoals[0]
+        highlight = []
+
+        while node.cost != 1:
+            highlight.append(node.coord)
+            node = node.parent
+        return node.coord
     #    for goal in goalnodes
     #       firststep 
     return None
-
-def astar(area, start, goal):
-    closedset = []
-    goalnodes = []
-    #open = getemptyadjecents(area, start)
-    openset = [Node(start, 0, 0, 0)]
-    camefrom = [] #MAP?
-    goalcost = 100000
-    while len(openset) != 0:
-        openset.sort()
-        current = openset.pop(0)
-        closedset.append(current)
-
-        for adjacent in getemptyadjecentslist(area, current.coord):
-            
-            skip = False
-            g = current.g + 1
-            h = manhattancc(adjacent, goal)
-            f = g + h
-            successor = Node(adjacent, f, g, h, current)
-            if successor in closedset:
-                continue
-            if g > goalcost:
-                break
-
-            if successor not in openset:
-                openset.append(successor)
-
-            if successor.coord == goal:
-                goalnodes = [successor]
-                goalcost = g
-                break
-        
-
-    if len(goalnodes) > 0:
-        prev = goalnodes[0]
-        node = goalnodes[0]
-        highlight = [node.coord]
-        while node.parent != None:
-            highlight.append(node.parent.coord)
-            prev = node
-            node = node.parent
-        #printmap(area, units, highlight)
-
-        return prev.coord, goalnodes[0].g
-    #    for goal in goalnodes
-    #       firststep 
-    return None, 0
