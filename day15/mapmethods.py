@@ -18,7 +18,7 @@ def printmap (area,units, highlights=[], xspot=Coord(-1,-1)):
         print()
     print('\n')
 
-def readmap (filename):
+def readmap (filename, elfpower=3):
     area = []
     units = []
     goblins = []
@@ -34,21 +34,18 @@ def readmap (filename):
                     units.append(goblin)
                     goblins.append(goblin)
                 elif char == 'E':
-                    elf = Elf(Coord(x,y), 200, 3, False)
+                    elf = Elf(Coord(x,y), 200, elfpower, False)
                     units.append(elf)
                     elves.append(elf)
                 arealine.append(char)
             area.append(arealine)
-    return area, units, elves, goblins
+    return area, units
 
 def isempty(area, coord):
     return area[coord.y][coord.x] == '.'
 
 def getemptyadjecentsset(area, coord):
     return {pos for pos in coord.getadjecents() if isempty(area, pos)}
-
-def getemptyclosecoordadjecents(area, attacker, target):
-    return [pos for pos in target.getclosecoordadjecents(attacker) if isempty(area, pos)]
 
 def getemptyadjecentslist(area, coord):
     return [pos for pos in coord.getadjecents() if isempty(area, pos)]
@@ -70,7 +67,6 @@ class Node:
     
     def __lt__(self, other):
         return self.cost < other.cost or (self.cost == other.cost and self.coord < other.coord)
-        #return self.coord < other.coord
     
     def __eq__(self,other):
         return other != None and self.coord == other.coord
@@ -81,7 +77,6 @@ class Node:
 
 def bfsearch(area, start, goals, units):
     closedset = []
-    #open = getemptyadjecents(area, start)
     openset = [Node(start, 0)]
     foundgoals = []
     anyfound = False
@@ -105,28 +100,9 @@ def bfsearch(area, start, goals, units):
             elif adjacent in goals:
                 anyfound = True
                 foundcost = successor.cost
-                #closedset.append(successor)
                 foundgoals.append(successor)
-                '''elif successor in closedset:
-                index = closedset.index(successor)
-                if cost < closedset[index].cost:
-                    closedset[index] = successor
-                continue'''
             elif successor not in openset:
                 openset.append(successor)
-        '''if start.x == 22 and start.y == 13:
-            printmap(area, units, [c.coord for c in closedset+openset], start)
-        if found:
-            anyfound = True
-            node = successor
-            highlight = []
-            while node.cost != 1:
-                highlight.append(node.coord)
-                node = node.parent
-            printmap(area, units, highlight, successor.coord)
-            
-
-            return node.coord'''
     if anyfound:
         foundgoals.sort()
         node = foundgoals[0]
@@ -136,6 +112,4 @@ def bfsearch(area, start, goals, units):
             highlight.append(node.coord)
             node = node.parent
         return node.coord
-    #    for goal in goalnodes
-    #       firststep 
     return None

@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from manhattan import *
 from coord import *
 
 class Unit(metaclass=ABCMeta):
@@ -11,15 +10,6 @@ class Unit(metaclass=ABCMeta):
 
     def __lt__(self, other):
         return self.coord < other.coord
-    
-    '''def __eq__(self, other):
-        "Used from "in" operator"
-        print('in check')
-        return self.x == other.x and self.y == other.y'''
-    
-    '''def iscolliding(self, other):
-        "Used for collision calculation, cant collide with itself"
-        return self.x == other.x and self.y == other.y'''
 
     def __str__(self):
         return self.symbol + '(' + str(self.hp) + ')'
