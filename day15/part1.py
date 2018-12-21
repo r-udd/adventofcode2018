@@ -2,7 +2,7 @@ from unit import *
 from mapmethods import *
 from manhattan import *
 
-area, units, elves, goblins = readmap('day15/testJ')
+area, units, elves, goblins = readmap('day15/testJ.2')
 printmap(area, units,[])
 gameover = False
 roundno = 0
@@ -53,4 +53,5 @@ while not gameover:
         totalhealth += unit.hp
     print('round', roundno, 'health', totalhealth, 'outcome', totalhealth*roundno)
     printmap(area, units)
+    input()
     roundno += 1

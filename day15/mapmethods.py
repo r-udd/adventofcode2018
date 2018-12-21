@@ -83,7 +83,9 @@ def bfsearch(area, start, goals, units):
     closedset = []
     #open = getemptyadjecents(area, start)
     openset = [Node(start, 0)]
-    found = False
+    firststeps = []
+    anyfound = False
+    foundcost = 0
     while len(openset) != 0:
         openset.sort()
         current = openset.pop(0)
@@ -93,19 +95,34 @@ def bfsearch(area, start, goals, units):
             
             cost = current.cost + 1
             successor = Node(adjacent, cost, current)
-            if adjacent in goals:
-                found = True
-                break
-            elif successor in closedset:
+            if successor in closedset:
+                continue
+            if anyfound and cost > foundcost:
+                closedset.append(successor)
+                continue
+            elif anyfound and cost < foundcost:
+                print('THIS SHOULD NOT HAPPEN')
+            elif adjacent in goals:
+                anyfound = True
+                foundcost = successor.cost
+                closedset.append(successor)
+                node = successor
+                highlight = []
+                while node.cost != 1:
+                    highlight.append(node.coord)
+                    node = node.parent
+                firststeps.append(node)
+                '''elif successor in closedset:
                 index = closedset.index(successor)
                 if cost < closedset[index].cost:
                     closedset[index] = successor
-                continue
-            if successor not in openset:
+                continue'''
+            elif successor not in openset:
                 openset.append(successor)
-        if start.x == 22 and start.y == 13:
+        '''if start.x == 22 and start.y == 13:
             printmap(area, units, [c.coord for c in closedset+openset], start)
         if found:
+            anyfound = True
             node = successor
             highlight = []
             while node.cost != 1:
@@ -114,7 +131,10 @@ def bfsearch(area, start, goals, units):
             printmap(area, units, highlight, successor.coord)
             
 
-            return node.coord
+            return node.coord'''
+    if anyfound:
+        firststeps.sort()
+        return firststeps[0].coord
     #    for goal in goalnodes
     #       firststep 
     return None
