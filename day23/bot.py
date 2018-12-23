@@ -9,3 +9,6 @@ class Bot ():
     
     def manhattan(self, bot):
         return abs (self.x - bot.x) + abs(self.y - bot.y) + abs(self.z - bot.z)
+
+    def inrange (self, bot):
+        return self.manhattan(bot) <= self.radius

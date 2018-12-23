@@ -14,7 +14,7 @@ with open('day23/input') as f:
             strongest = newbot
 count = 0
 for bot in bots:
-    if strongest.manhattan(bot) <= strongest.radius:
+    if strongest.inrange(bot):
         count += 1
 
 print(count)

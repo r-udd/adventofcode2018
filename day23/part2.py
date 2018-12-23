@@ -12,9 +12,15 @@ with open('day23/input') as f:
         bots.append(newbot)
         if strongest == None or newbot.radius > strongest.radius:
             strongest = newbot
-count = 0
-for bot in bots:
-    if strongest.manhattan(bot) <= strongest.radius:
-        count += 1
 
+maxbot = None
+maxbots = 0
+for origin in bots:
+    count = 0
+    for other in bots:
+        if other.inrange(origin):
+            count += 1
+    if count > maxbots:
+        maxbot = origin
+        maxbots = count
 print(count)
