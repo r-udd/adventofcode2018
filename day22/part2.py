@@ -5,6 +5,23 @@ import heapq
 tools = {'torch': '=', 'climb': '|', 'neither': '.'}
 #toolsallowed = {'=': {'climb', 'neither'}, '|': {'torch', 'neither'}, '.': {'climb', 'torch'}}
 
+dirs = ((-1, 0), (1, 0), (0, -1), (0, 1))
+
+def ispassable(area, x, y, tool):
+    return x >= 0 and y >= 0 and tools[tool] != area[y][x]
+
+def getadjecents(area, x, y, tool):
+    #possibles = (Coord(self.x, self.y-1), Coord(self.x-1, self.y), Coord(self.x+1, self.y), Coord(self.x, self.y+1))
+    return ((x + d[0], y + d[1]) for d in dirs if ispassable(area, x + d[0], y + d[1], tool))
+
+def getregiontype(area, x, y):
+    return area[y][x]
+
+def getnexttool(area, x, y, tool):
+    for t, weaktype in tools.items():
+        if t != tool and getregiontype(area, x, y) != weaktype:
+            return t
+
 def printmap (area, xrange, yrange, current, target, highlight):
     for y in yrange:
         for x in xrange:
@@ -12,74 +29,49 @@ def printmap (area, xrange, yrange, current, target, highlight):
                 print('@', end='')
             elif x == target.x and y == target.y:
                 print('T', end='')
-            elif c.Coord(x,y) in highlight:
-                print('X', end='')
+            #elif c.Node(x,y,) in highlight:
+            #    print('X', end='')
             else:
                 print(area[y][x], end='')
         print()
     print()
 
-def astar(area, start, target, tool):
+def astar(area, start, target):
     closedset = dict()
     #open = getemptyadjecents(area, start)
     opennodes = []
-    heapq.heappush(opennodes, c.Node(start, 0, 0, 0, tool))
+    #heapq.heappush(opennodes, start)
+    heapq.heappush(opennodes, (0, start.x, start.y, start.tool))
     smallestmanhattan = 1000000
-    while len(opennodes) != 0:
-        current = heapq.heappop(opennodes)
+    while opennodes:
+        #current = heapq.heappop(opennodes)
+        minutes, x, y, tool = heapq.heappop(opennodes)
         #print('f', current.f)
-        key = (current.coord.x, current.coord.y, current.tool)
-        closedset[key] = (current.f, current.g, current.h)
-        adjacents = current.getadjecents(area)
+        key = (x, y, tool)
+    
+        if key in closedset and closedset[key] <= minutes:
+            continue
+        closedset[key] = minutes
+        if x == target.x and y == target.y and tool == target.tool:
+            return minutes
+
+        heapq.heappush(opennodes, (minutes+7, x, y, getnexttool(area, x, y, tool)))
+        #heapq.heappush(opennodes, c.Node(current.x, current.y, current.getnexttool(area), current.minutes+7))
+        adjacents = getadjecents(area, x, y, tool)
         for adjacent in adjacents:
-
-            if adjacent == current.coord:
-                g = current.g + 7
-                tool = current.getnexttool(area)
-            else:
-                g = current.g + 1
-                tool = current.tool
-                            
-            h = m.manhattan(adjacent, target.coord)
-            if h < smallestmanhattan:
+            
+            adjacentminutes = minutes + 1
+            h = m.manhattan(adjacent[0], adjacent[1], target)
+            #if h < smallestmanhattan:
                 #print('manhattan dist to target', h)
-                smallestmanhattan = h
-            f = g + h
-            successor = c.Node(adjacent, f, g, h, tool)
+                #smallestmanhattan = h
 
-            if successor == target:
-                return successor
-            key = (adjacent.x, adjacent.y, tool)
-            if key in closedset:
-                if g < closedset[key][1]:
-                    #print("This shouldn't happen")
-                    closedset[key] = (f, g, h)
-                continue
-
-            try:
-                index = opennodes.index(successor)
-                if successor.g < opennodes[index].g:
-                    #print('Will it happen?')
-                    opennodes[index].g = g
-                    opennodes[index].f = f
-                continue
-            except ValueError:
-                pass
-            """if successor in opennodes:
-                index = opennodes.index(successor)
-                if successor.g > opennodes[index].g:
-                    continue
-                else:
-                    opennodes[index].g = g
-                    opennodes[index].f = f
-                    #print('replacing')"""
-            if successor not in opennodes:
-                heapq.heappush(opennodes, successor)
+            heapq.heappush(opennodes, (adjacentminutes, adjacent[0], adjacent[1], tool))
 
 def geologic (erosions, x, y, target):
     if x == 0 and y == 0:
         return 0
-    elif x == target.coord.x and y == target.coord.y:
+    elif x == target.x and y == target.y:
         return 0
     elif y == 0:
         return x * 16807
@@ -91,9 +83,9 @@ def geologic (erosions, x, y, target):
 def erosion(x, y, erosions, depth, mod, target):
     return (geologic(erosions, x, y, target) + depth) % mod
 
-target = c.Node(c.Coord(14,778), -1, -1, -1, 'torch')#c.Coord(9,796)#c.Coord(14,778)#c.Coord(10, 10)#
-xsize = target.coord.x + 200
-ysize = target.coord.y + 200
+target = c.Node(14, 778, 'torch')#c.Coord(9,796)#c.Coord(14,778)#c.Coord(10, 10)#
+xsize = target.x + 1000
+ysize = target.y + 1000
 erosions = [0] * xsize
 area = [[0] * xsize for x in range(ysize)]
 #erosions = [[0] * xsize for x in range(10)]
@@ -107,7 +99,7 @@ for y in range (ysize):
         erosions[x] = erosion(x, y, erosions, depth, mod, target)        
         risk = erosions[x] % 3
         totalrisk += risk
-        if x == target.coord.x and y == target.coord.y:
+        if x == target.x and y == target.y:
             char = '.'
             #print('T', end='')
         elif x == 0 and y == 0:
@@ -126,16 +118,15 @@ for y in range (ysize):
     #print()
 
 
-currenttool = 'torch'
-start = c.Coord(0,0)
+start = c.Node(0,0, 'torch', 0)
 
-printmap(area, range(target.coord.x - 10, target.coord.x + 10), range(target.coord.y - 10, target.coord.y + 10), start, target.coord, [])
+printmap(area, range(target.x - 10, target.x + 10), range(target.y - 10, target.y + 10), start, target, [])
 #printmap(area, start, target, [])
 #while True:
-print('Search commencing!' + target.coord.getregiontype(area))
+print('Search commencing!' + target.getregiontype(area))
 
-endnode = astar(area, start, target, currenttool)
-print('answer', endnode.g)
+endnode = astar(area, start, target)
+print('answer', endnode)
 #if endnode.tool != 'torch':
 #    totalcost += 7
 #highlight = []
