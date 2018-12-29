@@ -38,4 +38,6 @@ class Group:
         #print('units dead', damage, int(damage/self.hp))
         #print('before', self.units, 'remaining units', ceil((self.units * self.hp - damage) / self.hp))
         self.units = ceil((self.units * self.hp - damage) / self.hp)
+        return int(damage/self.hp)
+        
     
